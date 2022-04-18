@@ -1,7 +1,7 @@
 import { eLoadingState, FlowComponent,FlowMessageBox, FlowObjectData, FlowObjectDataArray, modalDialogButton} from 'flow-component-model';
 import * as React from 'react';
 import "./SiteDesigner.css";
-import { GetTenantToken, GetPageType, GetSiteValue } from './FlowFunctions';
+import { GetTenantToken, GetPageType, GetSiteValue, SetSiteValue } from './FlowFunctions';
 import FlowTenantToken from './FlowTenantToken';
 import { Page } from './Page';
 import SitePage from './SitePage';
@@ -39,6 +39,8 @@ export default class SiteDesigner extends FlowComponent {
         this.dragOver = this.dragOver.bind(this);
         this.dragLeave = this.dragLeave.bind(this);
         this.drop = this.drop.bind(this);
+
+        this.saveChanges = this.saveChanges.bind(this);
     }
 
     async componentDidMount(): Promise<void> {
@@ -72,6 +74,15 @@ export default class SiteDesigner extends FlowComponent {
             this.site = await GetSiteValue(this.tenantId, this.token);
         }
         this.forceUpdate();
+    }
+
+    async saveChanges() {
+        let newVal = this.site.toObjectData();
+        this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
+        if(this.token) {
+            await SetSiteValue(this.tenantId,this.token,newVal);
+        }
+        
     }
 
     registerChild(key: string, child: SitePage) {
@@ -189,7 +200,7 @@ export default class SiteDesigner extends FlowComponent {
         this.draggedItem = undefined;
         
     }
-    
+   
     render() {
         manywho.log.info('Rendering Site: ' + this.props.id);
 
@@ -212,6 +223,15 @@ export default class SiteDesigner extends FlowComponent {
             });
         }
 
+        let buttons: any[] = [];
+        buttons.push(
+            <span 
+                className="sitepage-header-button glyphicon glyphicon-floppy-disk"
+                title="Save"
+                onClick={this.saveChanges}
+            />
+        );
+
         return (
             <div 
                 className={className} 
@@ -223,6 +243,11 @@ export default class SiteDesigner extends FlowComponent {
                     parent={this}
                     ref={(element: FlowMessageBox) => {this.messageBox = element; }}
                 />
+                <div
+                    className='sitedesigner-header'
+                >
+                    {buttons}
+                </div>
                 <div
                     className='sitedesigner-canvas'
                 >

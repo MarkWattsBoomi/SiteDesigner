@@ -63,7 +63,17 @@ export class Page {
 
     toObjectData() : any {
         let objData: any = {};
-
+        objData.id = this.valueId;
+        objData.developerName = this.valueDeveloperName;
+        objData.developerSummary = this.valueDeveloperSummary;
+        objData.typeElementId = this.typeId;
+        objData.typeElementDeveloperName = this.typeDeveloperName;
+        objData.contentType = "ContentObject";
+        objData.updateByName = true;
+        objData.defaultObjectData = [];
+        this.children.forEach((child: PageInstance) => {
+            objData.defaultObjectData.push(child.toObjectData());
+        });
         return objData;
     }
 

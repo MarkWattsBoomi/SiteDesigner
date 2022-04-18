@@ -135,3 +135,38 @@ export async function GetSiteValue(tenantId: string, token: FlowTenantToken) : P
 
     return site;
 }
+
+export async function SetSiteValue(tenantId: string, token: FlowTenantToken, value: any) : Promise<any> {
+
+    let site: Page
+    const request: RequestInit = {};
+
+    request.method = "POST";  
+    request.headers = {
+        "Content-Type": "application/json",
+        "ManyWhoTenant": tenantId
+    };
+
+    if(token) {
+        request.headers.Authorization = token.token;
+    }
+        
+    request.credentials= "same-origin";
+    request.body=JSON.stringify(value);
+
+    let url: string = window.location.origin || 'https://flow.manywho.com';
+    url += "/api/draw/1/element/value";   
+
+    let response = await fetch(url, request);
+    if(response.status === 200) {
+            console.log("Value updated");
+    }
+    else {
+        //error
+        const errorText = await response.text();
+        console.log("Updating value failed - " + errorText);
+        
+    }
+
+    return true;
+}

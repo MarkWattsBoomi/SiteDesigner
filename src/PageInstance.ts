@@ -1,4 +1,4 @@
-import { FlowObjectData, FlowObjectDataArray } from "flow-component-model";
+import { eContentType, FlowObjectData, FlowObjectDataArray, FlowObjectDataProperty } from "flow-component-model";
 
 export class PageInstance {
 
@@ -40,8 +40,17 @@ export class PageInstance {
     }
 
     toObjectData() : any {
-        let objData: any = {};
+        let objData: FlowObjectData = FlowObjectData.newInstance("Page");
+        objData.addProperty(FlowObjectDataProperty.newInstance("Id", eContentType.ContentString, this.UID));
+        objData.addProperty(FlowObjectDataProperty.newInstance("Name", eContentType.ContentString, this.name));
+        objData.addProperty(FlowObjectDataProperty.newInstance("Title", eContentType.ContentString,this.title));
+        objData.addProperty(FlowObjectDataProperty.newInstance("BreadcrumbLabel", eContentType.ContentString,this.breadcrumb));
+        let children: FlowObjectDataArray = new FlowObjectDataArray();
+        this.children.forEach((child: PageInstance) => {
+            children.addItem(child.toObjectData());
+        });
+        objData.addProperty(FlowObjectDataProperty.newInstance("Children", eContentType.ContentList,children));
 
-        return objData;
+        return objData.iObjectData();
     }
 }

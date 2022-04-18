@@ -30,6 +30,12 @@ body {
     overflow: scroll;
 }
 
+.sitedesigner-header {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 0;
+}
+
 .sitedesigner-canvas {
     overflow: visible;
     display: flex;
