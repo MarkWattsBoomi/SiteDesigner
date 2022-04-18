@@ -1,0 +1,40 @@
+body {
+    overflow: hidden;
+}
+
+.main.container,
+.main.container>.clearfix,
+.main.container>.clearfix>.clearfix {
+    margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0;
+}
+
+.main.container>h2 {
+    display: none;
+}
+
+.main-scroller {
+    overflow: visible !important;
+    overflow-y: visible !important;
+}
+
+.sitedesigner {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: block;
+    overflow: scroll;
+}
+
+.sitedesigner-canvas {
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
