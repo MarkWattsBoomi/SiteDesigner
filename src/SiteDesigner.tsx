@@ -1,19 +1,21 @@
 import { eLoadingState, FlowComponent,FlowMessageBox, FlowObjectData, FlowObjectDataArray, modalDialogButton} from 'flow-component-model';
 import * as React from 'react';
 import "./SiteDesigner.css";
-import { GetTenantToken, GetPageType, GetSiteValue, SetSiteValue } from './FlowFunctions';
+import { GetTenantToken, GetValue, SetSiteValue, GetTypes } from './FlowFunctions';
 import FlowTenantToken from './FlowTenantToken';
 import { Page } from './Page';
 import SitePage from './SitePage';
 import PageEditForm from './PageEditForm';
 import { PageInstance } from './PageInstance';
+import { FlowType, FlowTypes } from './FlowType';
 
 
 declare var manywho: any;
 
 export default class SiteDesigner extends FlowComponent {
     token: FlowTenantToken;
-    pageType: Page;
+    flowTypes: FlowTypes;
+    pageType: FlowType;
     site: Page;
     children: Map<string,SitePage> = new Map();
     messageBox: FlowMessageBox;
@@ -70,19 +72,23 @@ export default class SiteDesigner extends FlowComponent {
     async loadSite() {
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
-            this.pageType = await GetPageType(this.tenantId, this.token);
-            this.site = await GetSiteValue(this.tenantId, this.token);
+            this.flowTypes = await GetTypes(this.tenantId, this.token);
+            this.pageType = this.flowTypes.getByDeveloperName("Page");
+            if(!this.pageType){
+
+            }
+            this.site = await GetValue(this.tenantId, this.token,"Site",this.pageType);
         }
         this.forceUpdate();
     }
 
     async saveChanges() {
-        let newVal = this.site.toObjectData();
+        let newVal = this.site.toObjectData(this.flowTypes.getByDeveloperName("Page"));
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
             await SetSiteValue(this.tenantId,this.token,newVal);
         }
-        
+        this.forceUpdate();
     }
 
     registerChild(key: string, child: SitePage) {

@@ -1,4 +1,5 @@
 import { eContentType, FlowObjectData, FlowObjectDataArray, FlowObjectDataProperty } from "flow-component-model";
+import { FlowType } from "./FlowType";
 import { PageInstance } from "./PageInstance";
 
 export class Page {
@@ -18,24 +19,7 @@ export class Page {
 
     }
 
-    public static parseType(src: any) : Page{
-        let type: Page = new Page();
-        type.typeId=src.id;
-        type.typeDeveloperName=src.developerName;
-        type.typeDeveloperSummary=src.developerSummary;
-        if(
-            !src.properties.find((prop: any) => {return prop.developerName==="Id"}) ||
-            !src.properties.find((prop: any) => {return prop.developerName==="Name"}) ||
-            !src.properties.find((prop: any) => {return prop.developerName==="Title"}) ||
-            !src.properties.find((prop: any) => {return prop.developerName==="BreadcrumbLabel"}) ||
-            !src.properties.find((prop: any) => {return prop.developerName==="Children"})
-        ) {
-            type.isValid=false;
-        }
-        return type;
-    }
-
-    public static parseValue(src: any) : Page {
+    public static parseValue(src: any, type: FlowType) : Page {
         let val: Page = new Page();
         val.valueId=src.id;
         val.valueDeveloperName=src.developerName;
@@ -44,7 +28,7 @@ export class Page {
         val.typeId=src.typeElementId;
         val.children=new Map();
         src.defaultObjectData.forEach((value: any) => {
-            let child : PageInstance = PageInstance.parse(new FlowObjectData([value]),null);
+            let child : PageInstance = PageInstance.parse(type, new FlowObjectData([value]),null);
             val.children.set(child.id,child);
         });
         
@@ -61,19 +45,24 @@ export class Page {
         return newPage;
     }
 
-    toObjectData() : any {
+    toObjectData(type: FlowType) : any {
         let objData: any = {};
         objData.id = this.valueId;
+        objData.access = "PUBLIC";
         objData.developerName = this.valueDeveloperName;
         objData.developerSummary = this.valueDeveloperSummary;
         objData.typeElementId = this.typeId;
         objData.typeElementDeveloperName = this.typeDeveloperName;
         objData.contentType = "ContentObject";
+        objData.elementType = "VARIABLE";
         objData.updateByName = true;
-        objData.defaultObjectData = [];
+        objData.defaultContentValue = null;
+        objData.initializationOperations = [];
+        let children: FlowObjectDataArray = new FlowObjectDataArray([]);
         this.children.forEach((child: PageInstance) => {
-            objData.defaultObjectData.push(child.toObjectData());
+            children.addItem(child.toObjectData(type));
         });
+        objData.defaultObjectData=children.iFlowObjectDataArray();
         return objData;
     }
 

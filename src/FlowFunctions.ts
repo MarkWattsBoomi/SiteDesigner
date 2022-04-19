@@ -1,4 +1,5 @@
 import FlowTenantToken from "./FlowTenantToken";
+import { FlowType, FlowTypes } from "./FlowType";
 import {Page} from "./Page";
 
 export async function GetTenantToken(userId: string, apiKey: string, tenantId : string): Promise<any> {
@@ -30,9 +31,10 @@ export async function GetTenantToken(userId: string, apiKey: string, tenantId : 
     }
 }
 
-export async function GetPageType(tenantId: string, token: FlowTenantToken) : Promise<Page> {
+export async function GetTypes(tenantId: string, token: FlowTenantToken) : Promise<FlowTypes> {
 
-    let page: Page
+    let types: FlowTypes;
+    
     const request: RequestInit = {};
 
     request.method = "GET";  
@@ -53,25 +55,8 @@ export async function GetPageType(tenantId: string, token: FlowTenantToken) : Pr
 
     let response = await fetch(url, request);
     if(response.status === 200) {
-        let types: any[] = await response.json();
-        let baseDef: any = types.filter((type: any) => { return type.developerName === "Page"})[0];
-        if(baseDef) {
-            let id: string = baseDef.id;
-            url += "/" + id;
-            response = await fetch(url, request);
-            if(response.status === 200) {
-                let type: any = await response.json();
-                page = Page.parseType(type);
-            }
-            else {
-                const errorText = await response.text();
-                console.log("Fetching type " + id + " failed - " + errorText); 
-            }
-            
-        }
-        else {
-            console.log("Type Page not found"); 
-        }
+        let typearray: any[] = await response.json();
+        types = FlowTypes.parse(typearray);
     }
     else {
         //error
@@ -80,10 +65,35 @@ export async function GetPageType(tenantId: string, token: FlowTenantToken) : Pr
         
     }
 
-    return page;
+    return types;
 }
 
-export async function GetSiteValue(tenantId: string, token: FlowTenantToken) : Promise<Page> {
+export async function CreateType(tenantId: string, token: FlowTenantToken, type: FlowType) : Promise<FlowType> {
+    const request: RequestInit = {};
+
+    request.method = "POST";  
+    request.headers = {
+        "Content-Type": "application/json",
+        "ManyWhoTenant": tenantId
+    };
+
+    if(token) {
+        request.headers.Authorization = token.token;
+    }
+        
+    request.credentials= "same-origin";
+
+    let url: string = window.location.origin || 'https://flow.manywho.com';
+    url += "/api/draw/1/element/type";
+    
+
+    let response = await fetch(url, request);
+    if(response.status === 200) {
+    }
+    return type;
+}
+
+export async function GetValue(tenantId: string, token: FlowTenantToken, name: string, type: FlowType) : Promise<Page> {
 
     let site: Page
     const request: RequestInit = {};
@@ -114,7 +124,7 @@ export async function GetSiteValue(tenantId: string, token: FlowTenantToken) : P
             response = await fetch(url, request);
             if(response.status === 200) {
                 let val: any = await response.json();
-                site = Page.parseValue(val);
+                site = Page.parseValue(val, type);
             }
             else {
                 const errorText = await response.text();

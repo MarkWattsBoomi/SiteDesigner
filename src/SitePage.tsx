@@ -7,6 +7,7 @@ import './SitePage.css';
 export default class SitePage extends React.Component<any,any> {
     me: any;
     item: any;
+    originalUID: string;
     //children: Map<string,SitePage> = new Map();
     lines: Map<string,Lines> = new Map();
     canvas: HTMLCanvasElement;
@@ -24,7 +25,8 @@ export default class SitePage extends React.Component<any,any> {
         this.generateLines=this.generateLines.bind(this);
         this.drawLines=this.drawLines.bind(this);
         this.resized=this.resized.bind(this);
-        this.moved=this.moved.bind(this);        
+        this.moved=this.moved.bind(this);   
+             
     }
 
     componentDidMount() {
@@ -37,6 +39,7 @@ export default class SitePage extends React.Component<any,any> {
         //force canvas coords to same dims as container
         this.canvas.height = this.canvas.clientHeight;
         this.canvas.width = this.canvas.clientWidth;
+        this.originalUID = this.props.page.UID;
         this.generateLines();
         this.drawLines();
     }
@@ -107,6 +110,7 @@ export default class SitePage extends React.Component<any,any> {
     editPage(e: any){
         let root: SiteDesigner = this.props.root;
         root.editPage(this.props.page);
+        this.originalUID = this.props.page.UID;
     }
 
     addLine(key: string, lines: Lines) {
@@ -122,6 +126,10 @@ export default class SitePage extends React.Component<any,any> {
         let parent: SitePage = this.props.parent;
         if(parent && parent.me) {
             let name: string = this.props.page.UID;
+            if(this.originalUID !== name) {
+                parent.addLine(this.originalUID,new Lines([]));
+                this.originalUID = name;
+            }
             console.log(name + " lines");
             if(name.startsWith("REGISTER_")) {
                 console.log("debug");
