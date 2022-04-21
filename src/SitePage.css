@@ -1,6 +1,6 @@
 .sitepage {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     width: fit-content;
     align-items: center;
     position: relative;
@@ -14,7 +14,8 @@
     width: fit-content;
     border-radius: 0.3rem;
     margin-right: 2rem;
-    margin-bottom: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     position: relative;
 }
 
@@ -95,7 +96,7 @@
 
 .sitepage-children {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     position: relative;
 }

@@ -27,20 +27,28 @@ body {
     top: 0;
     bottom: 0;
     display: block;
-    overflow: scroll;
+    
 }
 
 .sitedesigner-header {
     display: flex;
     flex-direction: row;
     flex-grow: 0;
+    height: 3rem;
+}
+
+.sitedesigner-scroller {
+    display: flex;
+    overflow: scroll;
+    height: calc(100vh - 3rem);
 }
 
 .sitedesigner-canvas {
     overflow: visible;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    margin: 1rem 1rem auto;
 }
 
 

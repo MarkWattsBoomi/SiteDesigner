@@ -143,6 +143,60 @@ export default class SitePage extends React.Component<any,any> {
             
             let parentItemRec : DOMRect = parent.item.getBoundingClientRect();
             let parentItemRecStyle: CSSStyleDeclaration = window.getComputedStyle(parent.item);
+            let parentItemRecLeftMargin: number = parseInt(parentItemRecStyle.marginLeft.substring(0,parentItemRecStyle.marginLeft.length-2));
+            let parentItemRecRightMargin: number = parseInt(parentItemRecStyle.marginRight.substring(0,parentItemRecStyle.marginRight.length-2));
+
+
+            //let parentItemRecLeftMargin: number = parseInt(parentItemRecStyle.marginLeft.substring(0,parentItemRecStyle.marginLeft.length-2));
+            let parentRight: number = parentItemRec.width + parentItemRecLeftMargin;
+            let parentCtr: number = parentRec.height / 2;
+            
+            //let parentBot: number = parentItemRec.height;// - parentItemRecBottomMargin;
+            //let parentCtr: number = parentRec.height / 2;
+            
+
+            let meRec : DOMRect = this.me.getBoundingClientRect();
+            let meRecStyle: CSSStyleDeclaration = window.getComputedStyle(this.item);
+            let meRecLeftMargin: number = parseInt(meRecStyle.marginLeft.substring(0,meRecStyle.marginLeft.length-2));
+            let meLeft: number = parentRight + parentItemRecRightMargin + meRecLeftMargin;
+
+            let meCenter: number = (meRec.top - parentRec.top) + (meRec.height / 2);
+            let hCenter: number = parentRight + ((parentItemRecRightMargin + meRecLeftMargin) / 2);
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#FF0000";
+
+            let lines: Lines = new Lines([]);
+            lines.addLine(new Line(new Point(parentRight, parentCtr),new Point(hCenter,parentCtr)));
+            lines.addLine(new Line(new Point(hCenter, parentCtr),new Point(hCenter,meCenter)));
+            lines.addLine(new Line(new Point(hCenter,meCenter),new Point(meLeft, meCenter)));
+
+            parent.addLine(name, lines);
+
+        }
+    }
+
+    generateLinesV() {
+        let parent: SitePage = this.props.parent;
+        if(parent && parent.me) {
+            let name: string = this.props.page.UID;
+            if(this.originalUID !== name) {
+                parent.addLine(this.originalUID,new Lines([]));
+                this.originalUID = name;
+            }
+            console.log(name + " lines");
+            if(name.startsWith("REGISTER_")) {
+                console.log("debug");
+            }
+            //force canvas to same dims as parent
+            //parent.canvas.height = parent.canvas.clientHeight;
+            //parent.canvas.width = parent.canvas.clientWidth;
+            let ctx: CanvasRenderingContext2D = parent.canvas.getContext("2d");
+            //ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            let parentRec : DOMRect = parent.me.getBoundingClientRect();
+            
+            let parentItemRec : DOMRect = parent.item.getBoundingClientRect();
+            let parentItemRecStyle: CSSStyleDeclaration = window.getComputedStyle(parent.item);
             let parentItemRecBottomMargin: number = parseInt(parentItemRecStyle.marginBottom.substring(0,parentItemRecStyle.marginBottom.length-2));
             //let parentItemRecLeftMargin: number = parseInt(parentItemRecStyle.marginLeft.substring(0,parentItemRecStyle.marginLeft.length-2));
             let parentBot: number = parentItemRec.height;// - parentItemRecBottomMargin;
@@ -191,7 +245,7 @@ export default class SitePage extends React.Component<any,any> {
         let page: PageInstance = this.props.page;
         let children: any[] = [];
 
-        page.children.forEach((child: PageInstance) => {
+        page.children?.forEach((child: PageInstance) => {
             children.push(
                 <SitePage 
                     key={page.UID}

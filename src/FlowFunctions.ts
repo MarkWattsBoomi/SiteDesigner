@@ -68,7 +68,7 @@ export async function GetTypes(tenantId: string, token: FlowTenantToken) : Promi
     return types;
 }
 
-export async function CreateType(tenantId: string, token: FlowTenantToken, type: FlowType) : Promise<FlowType> {
+export async function SaveType(tenantId: string, token: FlowTenantToken, type: FlowType) : Promise<FlowType> {
     const request: RequestInit = {};
 
     request.method = "POST";  
@@ -82,6 +82,7 @@ export async function CreateType(tenantId: string, token: FlowTenantToken, type:
     }
         
     request.credentials= "same-origin";
+    request.body=JSON.stringify(type.toObjectData());
 
     let url: string = window.location.origin || 'https://flow.manywho.com';
     url += "/api/draw/1/element/type";
@@ -89,8 +90,15 @@ export async function CreateType(tenantId: string, token: FlowTenantToken, type:
 
     let response = await fetch(url, request);
     if(response.status === 200) {
+        let newType = await response.json();
+        return FlowType.parse(newType);
     }
-    return type;
+    else {
+        //error
+        const errorText = await response.text();
+        console.log("Creating type failed - " + errorText);
+        return null;
+    }
 }
 
 export async function GetValue(tenantId: string, token: FlowTenantToken, name: string, type: FlowType) : Promise<Page> {
@@ -117,7 +125,7 @@ export async function GetValue(tenantId: string, token: FlowTenantToken, name: s
     let response = await fetch(url, request);
     if(response.status === 200) {
         let values: any[] = await response.json();
-        let baseVal: any = values.filter((type: any) => { return type.developerName === "Site"})[0];
+        let baseVal: any = values.filter((type: any) => { return type.developerName === name})[0];
         if(baseVal) {
             let id: string = baseVal.id;
             url += "/" + id;
@@ -128,12 +136,12 @@ export async function GetValue(tenantId: string, token: FlowTenantToken, name: s
             }
             else {
                 const errorText = await response.text();
-                console.log("Fetching type " + id + " failed - " + errorText); 
+                console.log("Fetching value " + name + " failed - " + errorText); 
             }
             
         }
         else {
-            console.log("Type Page not found"); 
+            console.log("Value " + name + " not found"); 
         }
     }
     else {
@@ -146,7 +154,7 @@ export async function GetValue(tenantId: string, token: FlowTenantToken, name: s
     return site;
 }
 
-export async function SetSiteValue(tenantId: string, token: FlowTenantToken, value: any) : Promise<any> {
+export async function SaveValue(tenantId: string, token: FlowTenantToken, value: any) : Promise<any> {
 
     let site: Page
     const request: RequestInit = {};

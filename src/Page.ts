@@ -40,7 +40,7 @@ export class Page {
         newPage.addProperty(FlowObjectDataProperty.newInstance("Id", eContentType.ContentString, ""));
         newPage.addProperty(FlowObjectDataProperty.newInstance("Name", eContentType.ContentString, name));
         newPage.addProperty(FlowObjectDataProperty.newInstance("Title", eContentType.ContentString,""));
-        newPage.addProperty(FlowObjectDataProperty.newInstance("BreadcrumbLabel", eContentType.ContentString,""));
+        newPage.addProperty(FlowObjectDataProperty.newInstance("Breadcrumb", eContentType.ContentString,""));
         newPage.addProperty(FlowObjectDataProperty.newInstance("Children", eContentType.ContentList,new FlowObjectDataArray));
         return newPage;
     }

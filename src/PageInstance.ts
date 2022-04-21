@@ -1,6 +1,12 @@
 import { eContentType, FlowObjectData, FlowObjectDataArray, FlowObjectDataProperty } from "flow-component-model";
 import { FlowType } from "./FlowType";
 
+declare global {
+    interface Crypto {
+    randomUUID: () => string;
+    }
+}
+
 export class PageInstance {
 
     id: string;
@@ -14,6 +20,16 @@ export class PageInstance {
     children: Map<string,PageInstance>;
 
     objectData: FlowObjectData;
+
+    constructor(uid?: string, name?:string, title?: string, breadcrumb?: string, parent?: string) {
+        this.id = crypto.randomUUID();
+        if(uid) this.UID = uid;
+        if(name) this.name = name;
+        if(title) this.title = title;
+        if(breadcrumb) this.breadcrumb = breadcrumb;
+        if(parent) this.parentId = parent;
+        this.children=new Map();
+    }
 
     public static parse(type: FlowType, src: FlowObjectData, parentId: string) : PageInstance {
         let val: PageInstance = new PageInstance();
@@ -31,6 +47,7 @@ export class PageInstance {
         return val;
     }
 
+    /*
     public static newInstance(name: string, parentId: string) : PageInstance {
         let newPage: PageInstance = new PageInstance();;
         newPage.parentId=parentId;
@@ -39,16 +56,16 @@ export class PageInstance {
         newPage.children=new Map();
         return newPage;
     }
-
+*/
     public toObjectData(type: FlowType) : FlowObjectData {
         let objData: FlowObjectData = FlowObjectData.newInstance("Page");
         objData.addProperty(FlowObjectDataProperty.newInstance("Id", eContentType.ContentString, this.UID));
         objData.addProperty(FlowObjectDataProperty.newInstance("Name", eContentType.ContentString, this.name));
         objData.addProperty(FlowObjectDataProperty.newInstance("Title", eContentType.ContentString,this.title));
-        objData.addProperty(FlowObjectDataProperty.newInstance("BreadcrumbLabel", eContentType.ContentString,this.breadcrumb));
+        objData.addProperty(FlowObjectDataProperty.newInstance("Breadcrumb", eContentType.ContentString,this.breadcrumb));
         objData.typeElementId=type.id;
         let children: FlowObjectDataArray = new FlowObjectDataArray();
-        this.children.forEach((child: PageInstance) => {
+        this.children?.forEach((child: PageInstance) => {
             children.addItem(child.toObjectData(type));
         });
         let childrenProp: any = FlowObjectDataProperty.newInstance("Children", eContentType.ContentList,children);

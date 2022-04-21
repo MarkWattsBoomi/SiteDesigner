@@ -1,16 +1,17 @@
 import { eLoadingState, FlowComponent,FlowMessageBox, FlowObjectData, FlowObjectDataArray, modalDialogButton} from 'flow-component-model';
 import * as React from 'react';
 import "./SiteDesigner.css";
-import { GetTenantToken, GetValue, SetSiteValue, GetTypes } from './FlowFunctions';
+import { GetTenantToken, GetValue, SaveValue, GetTypes, SaveType } from './FlowFunctions';
 import FlowTenantToken from './FlowTenantToken';
 import { Page } from './Page';
 import SitePage from './SitePage';
 import PageEditForm from './PageEditForm';
 import { PageInstance } from './PageInstance';
-import { FlowType, FlowTypes } from './FlowType';
+import { FlowType, FlowTypeProperty, FlowTypes } from './FlowType';
 
 
 declare var manywho: any;
+
 
 export default class SiteDesigner extends FlowComponent {
     token: FlowTenantToken;
@@ -73,20 +74,56 @@ export default class SiteDesigner extends FlowComponent {
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
             this.flowTypes = await GetTypes(this.tenantId, this.token);
-            this.pageType = this.flowTypes.getByDeveloperName("Page");
+            this.pageType = this.flowTypes.getByDeveloperName("$Page");
             if(!this.pageType){
+                let pgType = new FlowType();
+                pgType.developerName="$Page";
+                pgType.developerSummary="The definition of a site / portal page";
+                pgType.properties.add(new FlowTypeProperty("Id","ContentString",null,null,null));
+                pgType.properties.add(new FlowTypeProperty("Name","ContentString",null,null,null));
+                pgType.properties.add(new FlowTypeProperty("Title","ContentString",null,null,null));
+                pgType.properties.add(new FlowTypeProperty("Breadcrumb","ContentString",null,null,null));
+                pgType.properties.add(new FlowTypeProperty("Children","ContentList",null,"$Page",null));
+                let newType: FlowType = await SaveType(this.tenantId, this.token,pgType);
+                this.flowTypes.add(newType);
+                this.pageType = this.flowTypes.getByDeveloperName("$Page");
+            }
+            //check if children is correct type
+            if(this.pageType.properties.getByDeveloperName("Children").typeElementId !== this.pageType.id) {
+                this.pageType.properties.getByDeveloperName("Children").typeElementDeveloperName="$Page";
+                this.pageType.properties.getByDeveloperName("Children").typeElementId=this.pageType.id;
+                this.pageType.properties.getByDeveloperName("Children").contentType="ContentList";
+                let newType: FlowType = await SaveType(this.tenantId, this.token,this.pageType);
+                this.flowTypes.add(newType);
+                this.pageType = this.flowTypes.getByDeveloperName("$Page");
+            }
+
+            this.site = await GetValue(this.tenantId, this.token,"$Site",this.pageType);
+            if(!this.site) {
+                // $Site doesnt exist, create it
+                this.site=new Page();
+                this.site.valueDeveloperName = "$Site";
+                this.site.valueDeveloperSummary = "The definition of this tenant's web site";
+                this.site.typeDeveloperName = this.pageType.developerName;
+                this.site.typeDeveloperSummary = this.pageType.developerSummary;
+                this.site.typeId = this.pageType.id;
+                this.site.children = new Map();
+
+                let homePage: PageInstance = new PageInstance("HOME","Home","Home","Home",null);
+                this.site.children.set(homePage.UID, homePage);
+                await SaveValue(this.tenantId, this.token,this.site.toObjectData(this.pageType));
 
             }
-            this.site = await GetValue(this.tenantId, this.token,"Site",this.pageType);
+
         }
         this.forceUpdate();
     }
 
     async saveChanges() {
-        let newVal = this.site.toObjectData(this.flowTypes.getByDeveloperName("Page"));
+        let newVal = this.site.toObjectData(this.pageType);
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
-            await SetSiteValue(this.tenantId,this.token,newVal);
+            await SaveValue(this.tenantId,this.token,newVal);
         }
         this.forceUpdate();
     }
@@ -124,7 +161,7 @@ export default class SiteDesigner extends FlowComponent {
 
     addChild(page: PageInstance) {
         console.log("Add child to " + page.name);
-        let newChild: PageInstance = PageInstance.newInstance("New Page", page.UID);
+        let newChild: PageInstance = new PageInstance("","New Page","","", page.UID);
         let form = (
             <PageEditForm  
                 root={this}
@@ -255,9 +292,13 @@ export default class SiteDesigner extends FlowComponent {
                     {buttons}
                 </div>
                 <div
-                    className='sitedesigner-canvas'
+                    className='sitedesigner-scroller'
                 >
-                    {content}
+                    <div
+                        className='sitedesigner-canvas'
+                    >
+                        {content}
+                    </div>
                 </div>
                 
             </div>
