@@ -1,11 +1,14 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 
 export default class PageEditForm extends React.Component<any,any> {
     
+    
 
     render() {
 
+        let labelStyle: CSSProperties = {width:"10rem", fontSize: "1rem !important"};
+        let inputStyle: CSSProperties = {width:"30rem", fontSize: "1rem !important"};
         return (
             <div
                 className="modal-dialog-body"
@@ -15,11 +18,13 @@ export default class PageEditForm extends React.Component<any,any> {
                 >
                     <span
                         className="modal-dialog-input-label"
+                        style={labelStyle}
                     >
                         Id
                     </span>
                     <input 
                         className="modal-dialog-input"
+                        style={inputStyle}
                         type="text"
                         required={true}
                         value={this.props.page.UID}
@@ -31,11 +36,13 @@ export default class PageEditForm extends React.Component<any,any> {
                 >
                     <span
                         className="modal-dialog-input-label"
+                        style={labelStyle}
                     >
                         Name
                     </span>
                     <input 
                         className="modal-dialog-input"
+                        style={inputStyle}
                         type="text"
                         required={true}
                         value={this.props.page.name}
@@ -47,11 +54,13 @@ export default class PageEditForm extends React.Component<any,any> {
                 >
                     <span
                         className="modal-dialog-input-label"
+                        style={labelStyle}
                     >
                         Title
                     </span>
                     <input 
                         className="modal-dialog-input"
+                        style={inputStyle}
                         type="text"
                         required={true}
                         value={this.props.page.title}
@@ -63,11 +72,13 @@ export default class PageEditForm extends React.Component<any,any> {
                 >
                     <span
                         className="modal-dialog-input-label"
+                        style={labelStyle}
                     >
                         Breadcrumb Label
                     </span>
                     <input 
                         className="modal-dialog-input"
+                        style={inputStyle}
                         type="text"
                         required={true}
                         value={this.props.page.breadcrumb}
