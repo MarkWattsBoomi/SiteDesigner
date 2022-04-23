@@ -1,3 +1,4 @@
+import { FlowFlows } from "./FLowFlow";
 import FlowTenantToken from "./FlowTenantToken";
 import { FlowType, FlowTypes } from "./FlowType";
 import {Page} from "./Page";
@@ -29,6 +30,43 @@ export async function GetTenantToken(userId: string, apiKey: string, tenantId : 
         let error: string = await response.text();
         return Promise.resolve(error);
     }
+}
+
+export async function GetFlows(tenantId: string, token: FlowTenantToken) : Promise<FlowFlows> {
+
+    let flows: FlowFlows;
+    
+    const request: RequestInit = {};
+
+    request.method = "GET";  
+    request.headers = {
+        "Content-Type": "application/json",
+        "ManyWhoTenant": tenantId
+    };
+
+    if(token) {
+        request.headers.Authorization = token.token;
+    }
+        
+    request.credentials= "same-origin";
+
+    let url: string = window.location.origin || 'https://flow.manywho.com';
+    url += "/api/draw/1/flow";
+    
+
+    let response = await fetch(url, request);
+    if(response.status === 200) {
+        let flowArray: any[] = await response.json();
+        flows = FlowFlows.parse(flowArray);
+    }
+    else {
+        //error
+        const errorText = await response.text();
+        console.log("Fetching types failed - " + errorText);
+        
+    }
+
+    return flows;
 }
 
 export async function GetTypes(tenantId: string, token: FlowTenantToken) : Promise<FlowTypes> {

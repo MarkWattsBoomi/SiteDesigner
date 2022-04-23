@@ -1,4 +1,6 @@
 import React, { CSSProperties } from "react";
+import { FlowFlow } from "./FLowFlow";
+import SiteDesigner from "./SiteDesigner";
 
 
 export default class PageEditForm extends React.Component<any,any> {
@@ -6,9 +8,35 @@ export default class PageEditForm extends React.Component<any,any> {
     
 
     render() {
-
-        let labelStyle: CSSProperties = {width:"10rem", fontSize: "1rem !important"};
+        let root: SiteDesigner = this.props.root;
+        let labelStyle: CSSProperties = {width:"10rem", fontSize: "1rem !important",textAlign: "right"};
         let inputStyle: CSSProperties = {width:"30rem", fontSize: "1rem !important"};
+
+        if(!this.props.page.flow) {
+            this.props.page.flow = root.flowFlows.getAscending().values().next().value.id;
+        }
+
+        let options: any[] = [];
+        root.flowFlows.getAscending().forEach((flow: FlowFlow) => {
+            options.push(
+                <option
+                    value={flow.id}
+                    selected={this.props.page.flow === flow.id}
+                >
+                    {flow.developerName}
+                </option>
+            );
+        });
+        let flows = (
+            <select
+                className="modal-dialog-select"
+                style={inputStyle}
+                onChange={(e: any) => {this.props.page.flow = e.currentTarget.options[e.currentTarget.selectedIndex].value; this.forceUpdate()}}
+            >
+                {options}
+            </select>
+        );
+
         return (
             <div
                 className="modal-dialog-body"
@@ -84,6 +112,17 @@ export default class PageEditForm extends React.Component<any,any> {
                         value={this.props.page.breadcrumb}
                         onChange={(e: any) => {this.props.page.breadcrumb = e.currentTarget.value; this.forceUpdate()}}
                     />
+                </div>
+                <div
+                    className="modal-dialog-input-row"
+                >
+                    <span
+                        className="modal-dialog-input-label"
+                        style={labelStyle}
+                    >
+                        Flow
+                    </span>
+                    {flows}
                 </div>
             </div>
         );

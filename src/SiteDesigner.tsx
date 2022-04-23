@@ -1,13 +1,14 @@
 import { eLoadingState, FlowComponent,FlowMessageBox, FlowObjectData, FlowObjectDataArray, modalDialogButton} from 'flow-component-model';
 import * as React from 'react';
 import "./SiteDesigner.css";
-import { GetTenantToken, GetValue, SaveValue, GetTypes, SaveType } from './FlowFunctions';
+import { GetTenantToken, GetValue, SaveValue, GetTypes, SaveType, GetFlows } from './FlowFunctions';
 import FlowTenantToken from './FlowTenantToken';
 import { Page } from './Page';
 import SitePage from './SitePage';
 import PageEditForm from './PageEditForm';
 import { PageInstance } from './PageInstance';
 import { FlowType, FlowTypeProperty, FlowTypes } from './FlowType';
+import { FlowFlows } from './FLowFlow';
 
 
 declare var manywho: any;
@@ -15,6 +16,7 @@ declare var manywho: any;
 
 export default class SiteDesigner extends FlowComponent {
     token: FlowTenantToken;
+    flowFlows: FlowFlows;
     flowTypes: FlowTypes;
     pageType: FlowType;
     site: Page;
@@ -73,6 +75,7 @@ export default class SiteDesigner extends FlowComponent {
     async loadSite() {
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
+            this.flowFlows = await GetFlows(this.tenantId, this.token);
             this.flowTypes = await GetTypes(this.tenantId, this.token);
             this.pageType = this.flowTypes.getByDeveloperName("$Page");
             if(!this.pageType){
@@ -93,6 +96,18 @@ export default class SiteDesigner extends FlowComponent {
                 this.pageType.properties.getByDeveloperName("Children").typeElementDeveloperName="$Page";
                 this.pageType.properties.getByDeveloperName("Children").typeElementId=this.pageType.id;
                 this.pageType.properties.getByDeveloperName("Children").contentType="ContentList";
+                let newType: FlowType = await SaveType(this.tenantId, this.token,this.pageType);
+                this.flowTypes.add(newType);
+                this.pageType = this.flowTypes.getByDeveloperName("$Page");
+            }
+            //check if all fields are there
+            let needSave: boolean = false;
+            if(!this.pageType.properties.byDeveloperName.has("Flow")) {
+                let newProp: FlowTypeProperty = new FlowTypeProperty("Flow","ContentString","",null,null);
+                this.pageType.properties.add(newProp);
+                needSave = true;
+            }
+            if(needSave===true){
                 let newType: FlowType = await SaveType(this.tenantId, this.token,this.pageType);
                 this.flowTypes.add(newType);
                 this.pageType = this.flowTypes.getByDeveloperName("$Page");

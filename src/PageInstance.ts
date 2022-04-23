@@ -16,7 +16,7 @@ export class PageInstance {
     name: string;
     title: string;
     breadcrumb: string;
-    
+    flow: string;
     children: Map<string,PageInstance>;
 
     objectData: FlowObjectData;
@@ -38,7 +38,8 @@ export class PageInstance {
         val.UID=src.properties?.Id?.value as string;
         val.name=src.properties?.Name?.value as string;
         val.title=src.properties?.Title?.value as string;
-        val.breadcrumb=src.properties?.BreadcrumbLabel?.value as string;
+        val.breadcrumb=src.properties?.Breadcrumb?.value as string;
+        val.flow=src.properties?.Flow?.value as string;
         val.children=new Map();
         (src.properties?.Children?.value as FlowObjectDataArray)?.items.forEach((value: FlowObjectData) => {
             let child : PageInstance = PageInstance.parse(type, value, val.UID);
@@ -63,6 +64,7 @@ export class PageInstance {
         objData.addProperty(FlowObjectDataProperty.newInstance("Name", eContentType.ContentString, this.name));
         objData.addProperty(FlowObjectDataProperty.newInstance("Title", eContentType.ContentString,this.title));
         objData.addProperty(FlowObjectDataProperty.newInstance("Breadcrumb", eContentType.ContentString,this.breadcrumb));
+        objData.addProperty(FlowObjectDataProperty.newInstance("Flow", eContentType.ContentString,this.flow));
         objData.typeElementId=type.id;
         let children: FlowObjectDataArray = new FlowObjectDataArray();
         this.children?.forEach((child: PageInstance) => {
