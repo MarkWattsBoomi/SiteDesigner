@@ -14,6 +14,7 @@ export default class SitePage extends React.Component<any,any> {
     svg: SVGElement;
     resizeObserver: ResizeObserver;
     moveObserver: IntersectionObserver;
+    oldParent: SitePage;
 
     constructor(props: any) {
         super(props);
@@ -293,11 +294,23 @@ export default class SitePage extends React.Component<any,any> {
                     className="sitepage-item"
                     ref={(element: any) => {this.registerItem(element)}}
                     draggable={true}
-                    onDragStart={(e: any) => {root.dragStart(e,this.props.page)}}
+                    onDragStart={(e: any) => {
+                        this.oldParent = this.props.parent;
+                        let lines: Lines = new Lines([]);
+                        let name: string = this.props.page.UID;
+                        this.props.parent.addLine(name, lines);
+                        root.dragStart(e,this.props.page)
+                    }}
                     onDragEnter={(e: any) => {root.dragEnter(e,this.props.page)}}
                     onDragOver={(e: any) => {root.dragOver(e,this.props.page)}}
                     onDragLeave={(e: any) => {root.dragLeave(e,this.props.page)}}
-                    onDrop={(e: any) => {root.drop(e,this.props.page)}}
+                    onDrop={(e: any) => {
+                        //let parent: SitePage = this.props.parent;
+                        //let lines: Lines = new Lines([]);
+                        //let name: string = this.props.page.UID;
+                        //this.oldParent?.addLine(name, lines);
+                        root.drop(e,this.props.page);
+                    }}
                 >
                     <div
                         className="sitepage-header"

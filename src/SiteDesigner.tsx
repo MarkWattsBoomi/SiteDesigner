@@ -202,7 +202,12 @@ export default class SiteDesigner extends FlowComponent {
     }
 
     reHome(page: PageInstance, newParent: PageInstance) {
-        console.log("Add child to " + page.name)
+        console.log("Add child to " + page.name);
+        newParent.addChild(page);
+        if(page.parent) {
+            page.parent.removeChild(page);
+        }
+        this.forceUpdate();
     }
 
     dragStart(e: any, draggedItem: PageInstance) {
@@ -250,13 +255,11 @@ export default class SiteDesigner extends FlowComponent {
         }
         else {
             console.log(this.draggedItem.name + " moved from " + this.draggedItem.parentId + " to " + dropTarget.UID);
+            this.reHome(this.draggedItem,dropTarget);
             //this.draggedHelpItem.setParent(dropTarget.id);
             //this.doOutcome("onRehome", this.draggedHelpItem)
         }
-        
-
         this.draggedItem = undefined;
-        
     }
    
     render() {

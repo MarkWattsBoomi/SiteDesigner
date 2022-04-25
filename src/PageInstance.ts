@@ -11,7 +11,7 @@ export class PageInstance {
 
     id: string;
     parentId: string;
-
+    parent: PageInstance;
     UID: string;
     name: string;
     title: string;
@@ -31,9 +31,10 @@ export class PageInstance {
         this.children=new Map();
     }
 
-    public static parse(type: FlowType, src: FlowObjectData, parentId: string) : PageInstance {
+    public static parse(type: FlowType, src: FlowObjectData, parent: PageInstance) : PageInstance {
         let val: PageInstance = new PageInstance();
-        val.parentId=parentId;
+        val.parentId=parent?.UID;
+        val.parent=parent;
         val.id=src.internalId;
         val.UID=src.properties?.Id?.value as string;
         val.name=src.properties?.Name?.value as string;
@@ -42,22 +43,22 @@ export class PageInstance {
         val.flow=src.properties?.Flow?.value as string;
         val.children=new Map();
         (src.properties?.Children?.value as FlowObjectDataArray)?.items.forEach((value: FlowObjectData) => {
-            let child : PageInstance = PageInstance.parse(type, value, val.UID);
+            let child : PageInstance = PageInstance.parse(type, value, val);
             val.children.set(child.id,child);
         });       
         return val;
     }
 
-    /*
-    public static newInstance(name: string, parentId: string) : PageInstance {
-        let newPage: PageInstance = new PageInstance();;
-        newPage.parentId=parentId;
-        newPage.id="";
-        newPage.name=name;
-        newPage.children=new Map();
-        return newPage;
+    addChild(newChild: PageInstance) {
+        this.children.set(newChild.UID,newChild);
     }
-*/
+
+    removeChild(child: PageInstance) {
+        if(this.children?.has(child.id)) {
+            this.children.delete(child.id);
+        }
+    }
+
     public toObjectData(type: FlowType) : FlowObjectData {
         let objData: FlowObjectData = FlowObjectData.newInstance("Page");
         objData.addProperty(FlowObjectDataProperty.newInstance("Id", eContentType.ContentString, this.UID));
