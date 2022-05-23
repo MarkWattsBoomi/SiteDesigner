@@ -1,7 +1,7 @@
 {
-  "name": "sitedesigner",
+  "name": "flow_draw_components",
   "version": "1.0.0",
-  "description": "Design web site structure",
+  "description": "Flow Draw API Components",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
@@ -27,8 +27,8 @@
   },
   "flow": {
     "filenames": {
-      "js": "sitedesigner.js",
-      "css": "sitedesigner.css"
+      "js": "fdc.js",
+      "css": "fdc.css"
     }
   },
   "peerDependencies": {},

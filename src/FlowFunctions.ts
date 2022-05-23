@@ -1,3 +1,4 @@
+import { FlowAssets } from "./FlowAssets";
 import { FlowFlows } from "./FLowFlow";
 import FlowTenantToken from "./FlowTenantToken";
 import { FlowType, FlowTypes } from "./FlowType";
@@ -225,4 +226,41 @@ export async function SaveValue(tenantId: string, token: FlowTenantToken, value:
     }
 
     return true;
+}
+
+export async function GetAssets(tenantId: string, token: FlowTenantToken) : Promise<FlowAssets> {
+
+    let assets: FlowAssets;
+    
+    const request: RequestInit = {};
+
+    request.method = "GET";  
+    request.headers = {
+        "Content-Type": "application/json",
+        "ManyWhoTenant": tenantId
+    };
+
+    if(token) {
+        request.headers.Authorization = token.token;
+    }
+        
+    request.credentials= "same-origin";
+
+    let url: string = window.location.origin || 'https://flow.manywho.com';
+    url += "/api/draw/1/assets";
+    
+
+    let response = await fetch(url, request);
+    if(response.status === 200) {
+        let assetArray: any[] = await response.json();
+        assets = FlowAssets.parse(assetArray);
+    }
+    else {
+        //error
+        const errorText = await response.text();
+        console.log("Fetching assets failed - " + errorText);
+        
+    }
+
+    return assets;
 }
