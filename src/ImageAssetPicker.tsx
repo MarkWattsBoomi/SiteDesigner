@@ -59,7 +59,12 @@ export default class ImageAssetPicker extends FlowComponent {
 
     async assetSelected(key: any) {
         this.messageBox.hideMessageBox();
-        this.selectedAsset = this.flowAssets.get(key).publicUrl;
+        if(key) {
+            this.selectedAsset = this.flowAssets.get(key).publicUrl;
+        }
+        else {
+            this.selectedAsset = undefined;
+        }
         this.setStateValue(this.selectedAsset);
         if(this.outcomes["OnSelect"]){
             await this.triggerOutcome("OnSelect");
@@ -69,7 +74,8 @@ export default class ImageAssetPicker extends FlowComponent {
         }
     }
 
-    pickAsset() {
+    pickAsset(e: any) {
+        e.stopPropagation();
         if(!this.flowAssets)return;
         let options: any[] = [];
         let imgStyle: CSSProperties = {maxWidth: "100px",height: "100px", objectFit: "contain", cursor: "pointer"}
@@ -124,6 +130,33 @@ export default class ImageAssetPicker extends FlowComponent {
         if(this.model.visible===false) {
             classname += " hidden";
         }
+
+        let img: any;
+        if(this.selectedAsset) {
+            img = (
+                <img
+                    src={this.getStateValue() as string}
+                    style={iconStyle}
+                    onClick={this.pickAsset}
+                />
+            );
+        } 
+        else {
+            iconStyle.display = "flex";
+            img = (
+                <span
+                    className={"aip aip-none"}
+                    style={iconStyle}
+                    onClick={this.pickAsset}
+                >
+                    <span
+                        className="aip-none-label"
+                    >
+                        None 
+                    </span>   
+                </span>
+            );
+        }
         return(
             <div
                 className={classname}
@@ -135,11 +168,7 @@ export default class ImageAssetPicker extends FlowComponent {
                     id={this.componentId}
                 >
                     <label>{this.model.label}</label>
-                    <img
-                        src={this.getStateValue() as string}
-                        style={iconStyle}
-                        onClick={this.pickAsset}
-                    />
+                    {img}
                     <span
                         className="help-block"
                     >
