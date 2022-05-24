@@ -27,7 +27,6 @@ export default class ImageAssetPicker extends FlowComponent {
     async componentDidMount(): Promise<void> {
         await super.componentDidMount();
         (manywho as any).eventManager.addDoneListener(this.flowMoved, this.componentId);
-        this.selectedAsset = this.getStateValue() as string;
         this.loadAssets();        
     }
 
@@ -44,12 +43,14 @@ export default class ImageAssetPicker extends FlowComponent {
                 window.setTimeout(function() {me.flowMoved(xhr, request); }, 500);
             } else {
                 this.retries = 0;
+                this.loadAssets();
             }
         }
 
     }
 
     async loadAssets() {
+        this.selectedAsset = this.getStateValue() as string;
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
             this.flowAssets = await GetAssets(this.tenantId, this.token);

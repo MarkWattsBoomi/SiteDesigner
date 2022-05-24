@@ -33,5 +33,8 @@
   },
   "peerDependencies": {},
   "bundledDependencies": [],
-  "optionalDependencies": {}
+  "optionalDependencies": {},
+  "dependencies": {
+    "react-colorful": "^5.5.1"
+  }
 }

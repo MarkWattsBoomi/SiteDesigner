@@ -40,12 +40,14 @@ export default class FlowPicker extends FlowComponent {
                 window.setTimeout(function() {me.flowMoved(xhr, request); }, 500);
             } else {
                 this.retries = 0;
+                this.loadFlows(); 
             }
         }
 
     }
 
     async loadFlows() {
+        this.selectedFlow = this.getStateValue() as string;
         this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
             this.flowFlows = await GetFlows(this.tenantId, this.token);
@@ -53,10 +55,15 @@ export default class FlowPicker extends FlowComponent {
         this.forceUpdate();
     }
 
-    flowSelected(e: any) {
+    async flowSelected(e: any) {
         this.selectedFlow = e.currentTarget.options[e.currentTarget.selectedIndex].value; 
         this.setStateValue(this.selectedFlow);
-        this.forceUpdate()
+        if(this.outcomes["OnSelect"]){
+            await this.triggerOutcome("OnSelect");
+        }
+        else {
+            manywho.engine.sync(this.flowKey);
+        }
     }
 
     render() {

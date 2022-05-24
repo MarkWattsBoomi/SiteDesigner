@@ -1,0 +1,13 @@
+.fcp {
+    border: 1px solid #ccc;
+}
+
+.fcp-label {
+    margin: auto;
+    font-size: 1.1rem;
+    color: #000;
+    background-color: #fefefe;
+    text-transform: uppercase;
+    padding: 0 0.5rem;
+    line-height: 1.4;
+}
