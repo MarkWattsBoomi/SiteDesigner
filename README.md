@@ -41,6 +41,72 @@ Clicking the component will pop up a modal dialog with the color picker in it.
 A string field.
 
 ### width & height
-If specisied set the size of the component on the page in pixels
+If specified set the size of the component on the page in pixels
+
+## Outcomes
+
+### OnSelect
+If an outcome named specifically "OnSelect" is attached to the component it will be trigered when the user selects a new value.
 
 
+
+# ImageAssetPicker
+![Component Image](https://github.com/MarkWattsBoomi/SiteDesigner/blob/main/imgpicker.png)
+![Component Image](https://github.com/MarkWattsBoomi/SiteDesigner/blob/main/imgpickermodal.png)
+
+## Functionality
+
+Provides a graphical image picker component to select image type files from the current tenant's assets folder.
+
+Initially the current image is displayed.
+
+Clicking the component will pop up a modal dialog with the asset picker in it.
+
+## Component Configuration
+
+### State
+
+A string field to receive the asset's public url.
+
+### width & height
+If specified set the size of the component on the page in pixels and the size of the image tiles in the picker.
+
+### attributes
+
+#### user
+The email of a user with access to the tenant's design time.
+
+#### token
+A valid flow api token for that user.
+
+## Outcomes
+
+### OnSelect
+If an outcome named specifically "OnSelect" is attached to the component it will be trigered when the user selects a new value.
+
+
+# FlowPicker
+![Component Image](https://github.com/MarkWattsBoomi/SiteDesigner/blob/main/flowpicker.png)
+
+## Functionality
+
+Provides a combobox with a list of the flows in the current tenant.
+
+## Component Configuration
+
+### State
+
+A string field to receive the id of the selected flow.
+
+### attributes
+
+#### user
+The email of a user with access to the tenant's design time.
+
+#### token
+A valid flow api token for that user.
+
+## Outcomes
+
+### OnSelect
+If an outcome named specifically "OnSelect" is attached to the component it will be trigered when the user selects a new value.
