@@ -48,7 +48,7 @@ export default class FlowPicker extends FlowComponent {
 
     async loadFlows() {
         this.selectedFlow = this.getStateValue() as string;
-        this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
+        this.token = FlowTenantToken.parse(this.getAttribute("token"));//this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
             this.flowFlows = await GetFlows(this.tenantId, this.token);
         }
@@ -71,10 +71,10 @@ export default class FlowPicker extends FlowComponent {
         if(this.flowFlows){
             options.push(
                 <option
-                    value={undefined}
+                    value={""}
                     selected={this.selectedFlow === undefined}
                 >
-                    {"Please select"}
+                    {"None ..."}
                 </option>
             );
             this.flowFlows.getAscending().forEach((flow: FlowFlow) => {

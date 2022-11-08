@@ -23,9 +23,17 @@ export async function GetTenantToken(userId: string, apiKey: string, tenantId : 
 
     let response = await fetch(url, request);
     if(response.status === 200) {
-        let results: any = await response.json();
-        let token: FlowTenantToken= FlowTenantToken.parse(results);
-        return Promise.resolve(token);
+        let results: any;
+        try {
+            results = await response.json();
+            let token: FlowTenantToken= FlowTenantToken.parse(results);
+            return Promise.resolve(token);
+        }
+        catch(e) {
+            let error: any = await response.formData();
+            error=error.toString();
+            return Promise.resolve(error);
+        }        
     }
     else {
         let error: string = await response.text();
@@ -42,12 +50,13 @@ export async function GetFlows(tenantId: string, token: FlowTenantToken) : Promi
     request.method = "GET";  
     request.headers = {
         "Content-Type": "application/json",
-        "ManyWhoTenant": tenantId
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
     };
 
-    if(token) {
-        request.headers.Authorization = token.token;
-    }
+    //if(token) {
+    //    request.headers.Authorization = token.token;
+    //}
         
     request.credentials= "same-origin";
 
@@ -79,12 +88,13 @@ export async function GetTypes(tenantId: string, token: FlowTenantToken) : Promi
     request.method = "GET";  
     request.headers = {
         "Content-Type": "application/json",
-        "ManyWhoTenant": tenantId
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
     };
 
-    if(token) {
-        request.headers.Authorization = token.token;
-    }
+    //if(token) {
+    //    request.headers.Authorization = token.token;
+    //}
         
     request.credentials= "same-origin";
 
@@ -113,12 +123,13 @@ export async function SaveType(tenantId: string, token: FlowTenantToken, type: F
     request.method = "POST";  
     request.headers = {
         "Content-Type": "application/json",
-        "ManyWhoTenant": tenantId
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
     };
 
-    if(token) {
-        request.headers.Authorization = token.token;
-    }
+    //if(token) {
+    //    request.headers.Authorization = token.token;
+    //}
         
     request.credentials= "same-origin";
     request.body=JSON.stringify(type.toObjectData());
@@ -148,12 +159,13 @@ export async function GetValue(tenantId: string, token: FlowTenantToken, name: s
     request.method = "GET";  
     request.headers = {
         "Content-Type": "application/json",
-        "ManyWhoTenant": tenantId
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
     };
 
-    if(token) {
-        request.headers.Authorization = token.token;
-    }
+    //if(token) {
+    //    request.headers.Authorization = token.token;
+    //}
         
     request.credentials= "same-origin";
 
@@ -201,12 +213,13 @@ export async function SaveValue(tenantId: string, token: FlowTenantToken, value:
     request.method = "POST";  
     request.headers = {
         "Content-Type": "application/json",
-        "ManyWhoTenant": tenantId
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
     };
 
-    if(token) {
-        request.headers.Authorization = token.token;
-    }
+    //if(token) {
+    //    request.headers.Authorization = token.token;
+    //}
         
     request.credentials= "same-origin";
     request.body=JSON.stringify(value);
@@ -237,12 +250,13 @@ export async function GetAssets(tenantId: string, token: FlowTenantToken) : Prom
     request.method = "GET";  
     request.headers = {
         "Content-Type": "application/json",
-        "ManyWhoTenant": tenantId
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
     };
 
-    if(token) {
-        request.headers.Authorization = token.token;
-    }
+    //if(token) {
+    //    request.headers.Authorization = token.token;
+    //}
         
     request.credentials= "same-origin";
 

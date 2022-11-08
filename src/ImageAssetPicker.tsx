@@ -51,7 +51,7 @@ export default class ImageAssetPicker extends FlowComponent {
 
     async loadAssets() {
         this.selectedAsset = this.getStateValue() as string;
-        this.token = await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
+        this.token = FlowTenantToken.parse(this.getAttribute("token")); //await GetTenantToken(this.getAttribute("user"), this.getAttribute("token"),this.tenantId);
         if(this.token) {
             this.flowAssets = await GetAssets(this.tenantId, this.token);
         }
