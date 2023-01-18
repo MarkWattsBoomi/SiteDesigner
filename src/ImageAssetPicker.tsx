@@ -2,7 +2,7 @@ import { eLoadingState, FlowComponent, FlowMessageBox, modalDialogButton } from 
 import React, { CSSProperties } from "react";
 import { eAssetType, FlowAsset, FlowAssets } from "./FlowAssets";
 import "./ImageAssetPicker.css";
-import { GetAssets, GetFlows, GetTenantToken } from "./FlowFunctions";
+import { GetAssets, GetFlows, GetTenantToken, UpsertAsset } from "./FlowFunctions";
 import FlowTenantToken from "./FlowTenantToken";
 
 declare var manywho: any;
@@ -21,13 +21,15 @@ export default class ImageAssetPicker extends FlowComponent {
         this.flowMoved = this.flowMoved.bind(this);
         this.pickAsset = this.pickAsset.bind(this);
         this.assetSelected = this.assetSelected.bind(this);
-        //this.saveChanges = this.saveChanges.bind(this);
+        this.chooseFile = this.chooseFile.bind(this);
+        this.fileReadAsDataURL = this.fileReadAsDataURL.bind(this);
+        this.fileReadAsArrayBuffer = this.fileReadAsArrayBuffer.bind(this);
     }
 
     async componentDidMount(): Promise<void> {
         await super.componentDidMount();
         (manywho as any).eventManager.addDoneListener(this.flowMoved, this.componentId);
-        this.loadAssets();        
+        await this.loadAssets();        
     }
 
     async componentWillUnmount() {
@@ -75,8 +77,73 @@ export default class ImageAssetPicker extends FlowComponent {
         }
     }
 
-    pickAsset(e: any) {
-        e.stopPropagation();
+    async fileReadAsDataURL(file: any): Promise<any> {
+        const reader = new FileReader();
+
+        return new Promise((resolve, reject) => {
+            reader.onerror = () => {
+                reader.abort();
+                reject(new DOMException('Problem reading file'));
+            };
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async fileReadAsArrayBuffer(file: any): Promise<any> {
+        const reader = new FileReader();
+
+        return new Promise((resolve, reject) => {
+            reader.onerror = () => {
+                reader.abort();
+                reject(new DOMException('Problem reading file'));
+            };
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    async chooseFile(e: any) {
+
+        let pickerOpts: any = {
+            types: [
+                {
+                    description: 'Image files',
+                    accept: {
+                        'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+                    },
+                },
+            ],
+            excludeAcceptAllOption: true,
+            multiple: false,
+          };
+        
+        try{
+            let handle: any[] = await (window as any).showOpenFilePicker(pickerOpts);
+            if(handle[0].kind === 'file') {
+                let file = await handle[0].getFile();
+                let data = await this.fileReadAsArrayBuffer(file);
+                await UpsertAsset(this.tenantId, this.token, file, data);
+                this.loadAssets();
+                //this.messageBox.hideMessageBox();
+                this.pickAsset(null);
+            }
+        }
+        catch(e) {
+            console.log(e);
+        }
+        finally{
+            console.log("done");
+        }
+    }
+
+    async pickAsset(e: any) {
+        e?.stopPropagation();
+        await this.loadAssets();     
         if(!this.flowAssets)return;
         let options: any[] = [];
         let imgStyle: CSSProperties = {maxWidth: "100px",height: "100px", objectFit: "contain", cursor: "pointer"}
@@ -117,7 +184,7 @@ export default class ImageAssetPicker extends FlowComponent {
         this.messageBox.showMessageBox(
                 "Select an Image",
                 imgArray,
-                [new modalDialogButton("Cancel",this.messageBox.hideMessageBox)]
+                [new modalDialogButton("Cancel",this.messageBox.hideMessageBox),new modalDialogButton("Upload",this.chooseFile)]
         )
     }
 

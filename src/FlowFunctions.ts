@@ -254,10 +254,6 @@ export async function GetAssets(tenantId: string, token: FlowTenantToken) : Prom
         "x-boomi-flow-api-key": token.token,
     };
 
-    //if(token) {
-    //    request.headers.Authorization = token.token;
-    //}
-        
     request.credentials= "same-origin";
 
     let url: string = window.location.origin || 'https://flow.manywho.com';
@@ -273,6 +269,61 @@ export async function GetAssets(tenantId: string, token: FlowTenantToken) : Prom
         //error
         const errorText = await response.text();
         console.log("Fetching assets failed - " + errorText);
+        
+    }
+
+    return assets;
+}
+
+export async function UpsertAsset(tenantId: string, token: FlowTenantToken, file: File, data: any) : Promise<any> {
+
+    let assets: FlowAssets;
+    
+    const request: RequestInit = {};
+
+    request.method = "POST";  
+    request.headers = {
+        "Content-Type": "application/json",
+        "ManyWhoTenant": tenantId,
+        "x-boomi-flow-api-key": token.token,
+    };
+
+    request.credentials= "same-origin";
+
+    let url: string = window.location.origin || 'https://flow.manywho.com';
+    url += "/api/draw/1/assets/upload";
+    
+    let body: any = {
+        contentType: file.type,
+        key: file.name,
+        name: file.name,
+        size: file.size
+    };
+
+    request.body = JSON.stringify(body);
+
+    let response = await fetch(url, request);
+    if(response.status === 200) {
+        let uploadUrl: string = await response.text();
+        while(uploadUrl.indexOf("\"") >=0) {
+            uploadUrl = uploadUrl.replace("\"","");
+        }
+        let upReq: RequestInit = {};
+        upReq.method="PUT";
+        upReq.body=file;
+        let upresp = await fetch(uploadUrl,upReq);
+        if(upresp.status === 200) {
+            console.log("file uploaded"); 
+        }
+        else {
+            const errorText = await upresp.text();
+            console.log("pushing data failed - " + errorText); 
+        }
+    }
+    else {
+        //error
+        const errorText = await response.text();
+        console.log("Getting upload url failed - " + errorText);
         
     }
 
