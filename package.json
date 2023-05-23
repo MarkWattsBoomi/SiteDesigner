@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/react": "^16.14.23",
     "css-loader": "^6.6.2",
-    "flow-component-model": "^1.7.30",
+    "flow-component-model": "^1.8.0",
     "mini-css-extract-plugin": "1.6.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -31,14 +31,14 @@
       "css": "fdc.css"
     }
   },
-  "peerDependencies": {},
   "bundledDependencies": [],
-  "optionalDependencies": {},
   "dependencies": {
-    "react-colorful": "^5.5.1",
     "buffer": "^6.0.3",
+    "fcmkit": "^1.0.10",
     "react": "^16.3.2",
+    "react-colorful": "^5.5.1",
     "stream": "0.0.2",
     "timers": "^0.1.1"
-  }
+  },
+  "bundleDependencies": []
 }

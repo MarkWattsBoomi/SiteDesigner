@@ -1,4 +1,4 @@
-import { eLoadingState, FlowComponent,FlowMessageBox, FlowObjectData, FlowObjectDataArray, modalDialogButton} from 'flow-component-model';
+import { eLoadingState, FlowComponent } from 'flow-component-model';
 import * as React from 'react';
 import "./SiteDesigner.css";
 import { GetTenantToken, GetValue, SaveValue, GetTypes, SaveType, GetFlows } from './FlowFunctions';
@@ -9,6 +9,8 @@ import PageEditForm from './PageEditForm';
 import { PageInstance } from './PageInstance';
 import { FlowType, FlowTypeProperty, FlowTypes } from './FlowType';
 import { FlowFlows } from './FLowFlow';
+import { FCMModal } from 'fcmkit';
+import { FCMModalButton } from 'fcmkit/lib/ModalDialog/FCMModalButton';
 
 
 declare var manywho: any;
@@ -21,7 +23,7 @@ export default class SiteDesigner extends FlowComponent {
     pageType: FlowType;
     site: Page;
     children: Map<string,SitePage> = new Map();
-    messageBox: FlowMessageBox;
+    messageBox: FCMModal;
     retries: number = 0;
 
     form: any;
@@ -161,16 +163,17 @@ export default class SiteDesigner extends FlowComponent {
                 ref={(form: PageEditForm) => {this.form = form}}
             />
         );
-        this.messageBox.showMessageBox(
+        this.messageBox.showDialog(
+            null,
             "Edit Page",
             form,
-            [new modalDialogButton("Apply",this.pageEditied), new modalDialogButton("Cancel",this.messageBox.hideMessageBox)]
+            [new FCMModalButton("Apply",this.pageEditied), new FCMModalButton("Cancel",this.messageBox.hideDialog)]
         );
         
     }
 
     pageEditied() {
-        this.messageBox.hideMessageBox();
+        this.messageBox.hideDialog();
         this.forceUpdate();
     }
 
@@ -185,10 +188,11 @@ export default class SiteDesigner extends FlowComponent {
                 ref={(form: PageEditForm) => {this.form = form}}
             />
         );
-        this.messageBox.showMessageBox(
+        this.messageBox.showDialog(
+            null,
             "Add child page",
             form,
-            [new modalDialogButton("Apply",this.childAdded), new modalDialogButton("Cancel",this.messageBox.hideMessageBox)]
+            [new FCMModalButton("Apply",this.childAdded), new FCMModalButton("Cancel",this.messageBox.hideDialog)]
         );
     }
 
@@ -197,7 +201,7 @@ export default class SiteDesigner extends FlowComponent {
         let parent: PageInstance = form.props.pageParent;
         let child: PageInstance = form.props.page;
         parent.children.set(child.UID,child);
-        this.messageBox.hideMessageBox();
+        this.messageBox.hideDialog();
         this.forceUpdate();
     }
 
@@ -300,9 +304,9 @@ export default class SiteDesigner extends FlowComponent {
                 id={this.props.id} 
                 ref="container"
             >
-                <FlowMessageBox
+                <FCMModal
                     parent={this}
-                    ref={(element: FlowMessageBox) => {this.messageBox = element; }}
+                    ref={(element: FCMModal) => {this.messageBox = element; }}
                 />
                 <div
                     className='sitedesigner-header'

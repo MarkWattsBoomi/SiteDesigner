@@ -1,9 +1,11 @@
-import { eLoadingState, FlowComponent, FlowMessageBox, modalDialogButton } from "flow-component-model";
+import { eLoadingState, FlowComponent} from "flow-component-model";
 import React, { CSSProperties } from "react";
 import { eAssetType, FlowAsset, FlowAssets } from "./FlowAssets";
 import "./ImageAssetPicker.css";
 import { GetAssets, GetFlows, GetTenantToken, UpsertAsset } from "./FlowFunctions";
 import FlowTenantToken from "./FlowTenantToken";
+import { FCMModal } from "fcmkit";
+import { FCMModalButton } from "fcmkit/lib/ModalDialog/FCMModalButton";
 
 declare var manywho: any;
 
@@ -13,7 +15,7 @@ export default class ImageAssetPicker extends FlowComponent {
     flowAssets: FlowAssets;
     selectedAsset: string;
     retries: number = 0;
-    messageBox: FlowMessageBox;
+    messageBox: FCMModal;
 
     constructor(props: any) {
         super(props);
@@ -61,7 +63,7 @@ export default class ImageAssetPicker extends FlowComponent {
     }
 
     async assetSelected(key: any) {
-        this.messageBox.hideMessageBox();
+        this.messageBox.hideDialog();
         if(key) {
             this.selectedAsset = this.flowAssets.get(key).publicUrl;
         }
@@ -181,10 +183,11 @@ export default class ImageAssetPicker extends FlowComponent {
             </div>
         );
 
-        this.messageBox.showMessageBox(
+        this.messageBox.showDialog(
+                null,
                 "Select an Image",
                 imgArray,
-                [new modalDialogButton("Cancel",this.messageBox.hideMessageBox),new modalDialogButton("Upload",this.chooseFile)]
+                [new FCMModalButton("Cancel",this.messageBox.hideDialog),new FCMModalButton("Upload",this.chooseFile)]
         )
     }
 
@@ -229,8 +232,8 @@ export default class ImageAssetPicker extends FlowComponent {
             <div
                 className={classname}
             >
-                <FlowMessageBox 
-                    ref={(element: FlowMessageBox) => {this.messageBox = element}}
+                <FCMModal 
+                    ref={(element: FCMModal) => {this.messageBox = element}}
                 />
                 <div
                     id={this.componentId}

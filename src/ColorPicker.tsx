@@ -1,10 +1,11 @@
-import { eLoadingState, FlowComponent, FlowMessageBox, modalDialogButton } from "flow-component-model";
+import { eLoadingState, FlowComponent } from "flow-component-model";
 import React, { CSSProperties } from "react";
-import { eAssetType, FlowAsset, FlowAssets } from "./FlowAssets";
+import { FlowAssets } from "./FlowAssets";
 import "./ColorPicker.css";
-import { GetAssets, GetFlows, GetTenantToken } from "./FlowFunctions";
 import FlowTenantToken from "./FlowTenantToken";
 import { HexColorPicker } from "react-colorful";
+import { FCMModal } from "fcmkit";
+import { FCMModalButton } from "fcmkit/lib/ModalDialog/FCMModalButton";
 
 declare var manywho: any;
 
@@ -15,7 +16,7 @@ export default class ColorPicker extends FlowComponent {
     selectedColor: string;
     temporaryColor: string;
     retries: number = 0;
-    messageBox: FlowMessageBox;
+    messageBox: FCMModal;
 
     constructor(props: any) {
         super(props);
@@ -57,7 +58,7 @@ export default class ColorPicker extends FlowComponent {
     }
 
     async colorSelected() {
-        this.messageBox.hideMessageBox();
+        this.messageBox.hideDialog();
         this.selectedColor = this.temporaryColor;
         this.setStateValue(this.selectedColor);
         if(this.outcomes["OnSelect"]){
@@ -74,10 +75,11 @@ export default class ColorPicker extends FlowComponent {
 
     pickColor(e: any) {
         e.stopPropagation();
-        this.messageBox.showMessageBox(
+        this.messageBox.showDialog(
+            null,
                 "Select a Color",
                 (<HexColorPicker color={this.selectedColor || "#999"} onChange={this.setColor} />),
-                [new modalDialogButton("Select",this.colorSelected),new modalDialogButton("Cancel",this.messageBox.hideMessageBox)]
+                [new FCMModalButton("Select",this.colorSelected),new FCMModalButton("Cancel",this.messageBox.hideDialog)]
         )
     }
 
@@ -112,8 +114,8 @@ export default class ColorPicker extends FlowComponent {
             <div
                 className={classname}
             >
-                <FlowMessageBox 
-                    ref={(element: FlowMessageBox) => {this.messageBox = element}}
+                <FCMModal 
+                    ref={(element: FCMModal) => {this.messageBox = element}}
                 />
                 <div
                     id={this.componentId}
